@@ -3,8 +3,8 @@
  * @returns {Promise<void>}
  */
 export async function seed(knex) {
-    await knex("spreadsheets")
-        .insert([{ spreadsheet_id: "some_spreadsheet" }])
-        .onConflict(["spreadsheet_id"])
+    await knex("box_tariffs")
+        .insert([{ id: 1 }])
+        .onConflict(["id"])
         .ignore();
 }

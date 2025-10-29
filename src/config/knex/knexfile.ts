@@ -1,6 +1,11 @@
 import env from "#config/env/env.js";
-import { Knex } from "knex";
+import type { Knex } from "knex";
 import { z } from "zod";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const connectionSchema = z.object({
     host: z.string(),
@@ -12,7 +17,7 @@ const connectionSchema = z.object({
 
 const NODE_ENV = env.NODE_ENV ?? "development";
 
-const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
+const knexConfigs: Record<typeof NODE_ENV, Knex.Config> = {
     development: {
         client: "pg",
         connection: () =>
@@ -28,14 +33,14 @@ const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
             max: 10,
         },
         migrations: {
-            stub: 'src/config/knex/migration.stub.js',
-            directory: "./src/postgres/migrations",
+            stub: path.resolve(__dirname, "migration.stub.js"),
+            directory: path.resolve(__dirname, "../../../src/postgres/migrations"),
             tableName: "migrations",
             extension: "ts",
         },
         seeds: {
-            stub: 'src/config/knex/seed.stub.js',
-            directory: "./src/postgres/seeds",
+            stub: path.resolve(__dirname, "seed.stub.js"),
+            directory: path.resolve(__dirname, "../../../src/postgres/seeds"),
             extension: "js",
         },
     },
@@ -54,17 +59,17 @@ const knegConfigs: Record<typeof NODE_ENV, Knex.Config> = {
             max: 10,
         },
         migrations: {
-            stub: 'dist/config/knex/migration.stub.js',
-            directory: "./dist/postgres/migrations",
+            stub: path.resolve(__dirname, "../../../../dist/config/knex/migration.stub.js"),
+            directory: path.resolve(__dirname, "../../../../dist/postgres/migrations"),
             tableName: "migrations",
             extension: "js",
         },
         seeds: {
-            stub: 'src/config/knex/seed.stub.js',
-            directory: "./dist/postgres/seeds",
+            stub: path.resolve(__dirname, "seed.stub.js"),
+            directory: path.resolve(__dirname, "../../../../dist/postgres/seeds"),
             extension: "js",
         },
     },
 };
 
-export default knegConfigs[NODE_ENV];
+export default knexConfigs[NODE_ENV];
