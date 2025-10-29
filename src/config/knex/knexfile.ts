@@ -59,14 +59,14 @@ const knexConfigs: Record<typeof NODE_ENV, Knex.Config> = {
             max: 10,
         },
         migrations: {
-            stub: path.resolve(__dirname, "../../../../dist/config/knex/migration.stub.js"),
-            directory: path.resolve(__dirname, "../../../../dist/postgres/migrations"),
+            stub: "dist/config/knex/migration.stub.js",
+            directory: "dist/postgres/migrations",
             tableName: "migrations",
             extension: "js",
         },
         seeds: {
-            stub: path.resolve(__dirname, "seed.stub.js"),
-            directory: path.resolve(__dirname, "../../../../dist/postgres/seeds"),
+            stub: "dist/config/knex/seed.stub.js",
+            directory: "dist/postgres/seeds",
             extension: "js",
         },
     },
