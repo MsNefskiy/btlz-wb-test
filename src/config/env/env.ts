@@ -24,6 +24,8 @@ const envSchema = z.object({
             .transform((value) => parseInt(value)),
     ]),
     WB_API_TOKEN: z.string(),
+    GOOGLE_SHEETS_CREDENTIALS: z.string(),
+    SPREADSHEET_IDS: z.string(),
 });
 
 const env = envSchema.parse({
@@ -35,6 +37,8 @@ const env = envSchema.parse({
     NODE_ENV: process.env.NODE_ENV,
     APP_PORT: process.env.APP_PORT,
     WB_API_TOKEN: process.env.WB_API_TOKEN,
+    GOOGLE_SHEETS_CREDENTIALS: process.env.GOOGLE_SHEETS_CREDENTIALS,
+    SPREADSHEET_IDS: process.env.SPREADSHEET_IDS,
 });
 
 export default env;
