@@ -10,6 +10,10 @@ export class DatabaseService {
         this.db = knex(knexConfigs);
     }
 
+    async clearBoxTariffs(): Promise<void> {
+        await this.db("box_tariffs").del();
+    }
+
     async saveOrUpdateBoxTariffs(date: string, tariffs: WarehouseTariff[]): Promise<void> {
         await this.db.transaction(async (trx) => {
             for (const tariff of tariffs) {
@@ -39,7 +43,8 @@ export class DatabaseService {
     }
 
     async getActualTariffs(): Promise<any[]> {
-        return this.db("box_tariffs").where("date", this.db.raw("(SELECT MAX(date) FROM box_tariffs)")).orderBy("box_storage_coef_expr", "asc");
+        return this.db("box_tariffs").where("date", this.db.raw("(SELECT MAX(date) FROM box_tariffs)"))
+            .orderBy("box_storage_coef_expr", "asc");
     }
 
     destroy(): void {

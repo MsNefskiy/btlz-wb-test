@@ -1,18 +1,24 @@
-export function parseDecimal(value: string): number {
-    if (!value || typeof value !== "string") {
-        throw new Error(`Invalid value for decimal parsing: ${value}`);
+export function parseDecimal(value: string | null | undefined): number | null {
+    if (value == null) {
+        return null;
+    }
+
+    if (typeof value !== "string") {
+        return null;
+    }
+
+    const trimmed = value.trim();
+    if (trimmed === "" || trimmed === "-") {
+        return null;
     }
 
     try {
-        const normalizedValue = parseFloat(value.replace(",", "."));
-
+        const normalizedValue = parseFloat(trimmed.replace(",", "."));
         if (isNaN(normalizedValue)) {
-            throw new Error(`Failed to parse value: ${value}`);
+            return null;
         }
-
         return normalizedValue;
-    } catch (error) {
-        console.error(`Error parsing decimal value: ${value}`, error);
-        throw error;
+    } catch {
+        return null;
     }
 }
