@@ -1,8 +1,8 @@
-import cron from "node-cron";
 import { DatabaseService } from "#services/db.service.js";
 import { WbApiService } from "#services/wb.service.js";
 import env from "#config/env/env.js";
 import { GoogleSheetsService } from "#services/google-sheets.service.js";
+import { scheduleJob } from "node-schedule";
 
 export class Scheduler {
     private wbApiService: WbApiService;
@@ -14,13 +14,13 @@ export class Scheduler {
     }
 
     start(): void {
-        cron.schedule("0 * * * *", async () => {
+        scheduleJob("*/1 * * * *", async () => {
             console.log("Запуск ежечасного обновления тарифов...");
             await this.updateTariffs();
         });
 
         // Обновление Google Sheets каждые 6 часов (в 5 минут часа)
-        cron.schedule("5 */6 * * *", async () => {
+        scheduleJob("*/5 * * * *", async () => {
             console.log("Запуск обновления Google Sheets...");
             await this.updateGoogleSheets();
         });

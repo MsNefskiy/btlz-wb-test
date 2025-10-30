@@ -3,7 +3,6 @@
  * @returns {Promise<void>}
  */
 export async function seed(knex) {
-    // Полное обновление сидов: очищаем таблицу перед вставкой
     await knex("box_tariffs").del();
 
     await knex("box_tariffs")
@@ -24,6 +23,6 @@ export async function seed(knex) {
                 box_storage_liter: 1.5,
             },
         ])
-        .onConflict(["id"]) // при повторном запуске гарантируем перезапись
+        .onConflict(["id"])
         .merge();
 }

@@ -30,14 +30,13 @@
     "author": "lucard17",
     "license": "ISC",
     "dependencies": {
-        "@types/cron": "^2.0.1",
         "axios": "^1.13.1",
         "commander": "^13.1.0",
         "dotenv": "^16.3.1",
         "googleapis": "^144.0.0",
         "knex": "^3.0.1",
         "log4js": "^6.9.1",
-        "node-cron": "^4.2.1",
+        "node-schedule": "^2.1.1",
         "pg": "^8.11.3",
         "zod": "^3.23.8"
     },
@@ -55,6 +54,7 @@
         "@types/jsonwebtoken": "^9.0.8",
         "@types/knex": "^0.16.1",
         "@types/node": "^24.9.2",
+        "@types/node-schedule": "^2.1.8",
         "@types/pg": "^8.11.10",
         "@types/uuid": "^10.0.0",
         "babel-jest": "^29.7.0",
