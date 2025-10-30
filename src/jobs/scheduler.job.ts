@@ -17,13 +17,15 @@ export class Scheduler {
     }
 
     start(): void {
-        scheduleJob("0 * * * *", async () => {
+        const tariffsCron = env.TARIFFS_CRON as string;
+        const sheetsCron = env.SHEETS_CRON as string;
+
+        scheduleJob(tariffsCron, async () => {
             log.info("Запуск ежечасного обновления тарифов...");
             await this.updateTariffs();
         });
 
-        // Обновление Google Sheets каждые 6 часов (в 5 минут часа)
-        scheduleJob("5 */6 * * *", async () => {
+        scheduleJob(sheetsCron, async () => {
             log.info("Запуск обновления Google Sheets...");
             await this.updateGoogleSheets();
         });
@@ -32,11 +34,8 @@ export class Scheduler {
     private async updateTariffs(): Promise<void> {
         try {
             const today = new Date().toISOString().split("T")[0];
-
             const tariffs = await this.wbApiService.getBoxTariffs(today);
-
             await this.dbService.saveOrUpdateBoxTariffs(today, tariffs);
-
             log.info(`Успешно обновлены тарифы на ${today}. Получено записей: ${tariffs.length}`);
         } catch (error) {
             log.error("Ошибка при обновлении тарифов:", error);
@@ -47,13 +46,10 @@ export class Scheduler {
         try {
             const sheetsService = new GoogleSheetsService(env.GOOGLE_SHEETS_CREDENTIALS);
             const tariffs = await this.dbService.getActualTariffs();
-
             const spreadsheetIds = env.SPREADSHEET_IDS?.split(",") || [];
-
             for (const spreadsheetId of spreadsheetIds) {
                 await sheetsService.updateSheet(spreadsheetId.trim(), tariffs);
             }
-
             log.info(`Обновлено ${spreadsheetIds.length} таблиц`);
         } catch (error) {
             log.error("Ошибка при обновлении Google Sheets:", error);
