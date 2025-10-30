@@ -2,7 +2,10 @@ import { DatabaseService } from "#services/db.service.js";
 import { WbApiService } from "#services/wb.service.js";
 import env from "#config/env/env.js";
 import { GoogleSheetsService } from "#services/google-sheets.service.js";
+import { getLogger } from "#utils/logger.js";
 import { scheduleJob } from "node-schedule";
+
+const log = getLogger("scheduler");
 
 export class Scheduler {
     private wbApiService: WbApiService;
@@ -14,14 +17,14 @@ export class Scheduler {
     }
 
     start(): void {
-        scheduleJob("*/1 * * * *", async () => {
-            console.log("Запуск ежечасного обновления тарифов...");
+        scheduleJob("0 * * * *", async () => {
+            log.info("Запуск ежечасного обновления тарифов...");
             await this.updateTariffs();
         });
 
         // Обновление Google Sheets каждые 6 часов (в 5 минут часа)
-        scheduleJob("*/5 * * * *", async () => {
-            console.log("Запуск обновления Google Sheets...");
+        scheduleJob("5 */6 * * *", async () => {
+            log.info("Запуск обновления Google Sheets...");
             await this.updateGoogleSheets();
         });
     }
@@ -34,9 +37,9 @@ export class Scheduler {
 
             await this.dbService.saveOrUpdateBoxTariffs(today, tariffs);
 
-            console.log(`Успешно обновлены тарифы на ${today}. Получено записей: ${tariffs.length}`);
+            log.info(`Успешно обновлены тарифы на ${today}. Получено записей: ${tariffs.length}`);
         } catch (error) {
-            console.error("Ошибка при обновлении тарифов:", error);
+            log.error("Ошибка при обновлении тарифов:", error);
         }
     }
 
@@ -51,9 +54,9 @@ export class Scheduler {
                 await sheetsService.updateSheet(spreadsheetId.trim(), tariffs);
             }
 
-            console.log(`Обновлено ${spreadsheetIds.length} таблиц`);
+            log.info(`Обновлено ${spreadsheetIds.length} таблиц`);
         } catch (error) {
-            console.error("Ошибка при обновлении Google Sheets:", error);
+            log.error("Ошибка при обновлении Google Sheets:", error);
         }
     }
 }

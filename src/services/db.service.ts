@@ -2,6 +2,9 @@ import knex, { Knex } from "knex";
 import knexConfigs from "#config/knex/knexfile.js";
 import { parseDecimal } from "#utils/parsers.js";
 import { WarehouseTariff } from "#types/wb.type.js";
+import { getLogger } from "#utils/logger.js";
+
+const log = getLogger("db");
 
 export class DatabaseService {
     private db: Knex;
@@ -11,10 +14,12 @@ export class DatabaseService {
     }
 
     async clearBoxTariffs(): Promise<void> {
+        log.warn("Очистка таблицы box_tariffs");
         await this.db("box_tariffs").del();
     }
 
     async saveOrUpdateBoxTariffs(date: string, tariffs: WarehouseTariff[]): Promise<void> {
+        log.info("Сохранение тарифов: %d записей на %s", tariffs.length, date);
         await this.db.transaction(async (trx) => {
             for (const tariff of tariffs) {
                 const tariffData = {
@@ -40,14 +45,16 @@ export class DatabaseService {
                 }
             }
         });
+        log.info("Сохранение тарифов завершено");
     }
 
     async getActualTariffs(): Promise<any[]> {
-        return this.db("box_tariffs").where("date", this.db.raw("(SELECT MAX(date) FROM box_tariffs)"))
-            .orderBy("box_storage_coef_expr", "asc");
+        log.debug("Запрос актуальных тарифов");
+        return this.db("box_tariffs").where("date", this.db.raw("(SELECT MAX(date) FROM box_tariffs)")).orderBy("box_storage_coef_expr", "asc");
     }
 
     destroy(): void {
+        log.info("Закрытие соединения с БД");
         this.db.destroy();
     }
 }
