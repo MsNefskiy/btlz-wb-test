@@ -13,6 +13,12 @@ export class DatabaseService {
         this.db = knex(knexConfigs);
     }
 
+    async checkConnection(): Promise<void> {
+        log.info("Проверка подключения к БД...");
+        await this.db.raw("select 1");
+        log.info("Подключение к БД установлено");
+    }
+
     async clearBoxTariffs(): Promise<void> {
         log.warn("Очистка таблицы box_tariffs");
         await this.db("box_tariffs").del();
