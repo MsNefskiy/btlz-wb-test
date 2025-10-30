@@ -1,3 +1,4 @@
+import { isValidCron } from "#utils/parsers.js";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -5,11 +6,6 @@ import { z } from "zod";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
-
-const cronSchema = z
-    .string()
-    .min(1)
-    .regex(/^[^\n]+$/);
 
 const envSchema = z.object({
     NODE_ENV: z.union([z.undefined(), z.enum(["development", "production"])]),
@@ -31,8 +27,8 @@ const envSchema = z.object({
     WB_API_TOKEN: z.string(),
     GOOGLE_SHEETS_CREDENTIALS: z.string(),
     SPREADSHEET_IDS: z.string(),
-    TARIFFS_CRON: z.union([z.undefined(), cronSchema]),
-    SHEETS_CRON: z.union([z.undefined(), cronSchema]),
+    TARIFFS_CRON: z.union([z.undefined(), z.string()]),
+    SHEETS_CRON: z.union([z.undefined(), z.string()]),
 });
 
 const env = envSchema.parse({
@@ -46,8 +42,8 @@ const env = envSchema.parse({
     WB_API_TOKEN: process.env.WB_API_TOKEN,
     GOOGLE_SHEETS_CREDENTIALS: process.env.GOOGLE_SHEETS_CREDENTIALS,
     SPREADSHEET_IDS: process.env.SPREADSHEET_IDS,
-    TARIFFS_CRON: process.env.TARIFFS_CRON ?? "0 * * * *", //раз в час
-    SHEETS_CRON: process.env.SHEETS_CRON ?? "5 */6 * * *", //каждые 6 часов в 5 минут
+    TARIFFS_CRON: isValidCron(process.env.TARIFFS_CRON) ? (process.env.TARIFFS_CRON as string) : "0 * * * *", //раз в час
+    SHEETS_CRON: isValidCron(process.env.SHEETS_CRON) ? (process.env.SHEETS_CRON as string) : "5 */6 * * *", //каждые 6 часов в 5 минут
 });
 
 export default env;
